@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.util.Log
 import android.view.Window
 import com.frostnerd.dnstunnelproxy.DnsServerInformation
 import com.frostnerd.dnstunnelproxy.json.DnsServerInformationTypeAdapter
@@ -75,11 +76,13 @@ class BackgroundVpnConfigureActivity : BaseActivity() {
         }
 
         fun writeServerInfoToIntent(info:DnsServerInformation<*>, intent:Intent) {
+            Log.d("rustyt", info.toString())
             intent.putExtra(extraKeyServerConfig, info.toJson())
             intent.putExtra(extraKeyServerType, info.type.typeString)
         }
 
         fun writeServerInfoToIntent(info:DnsServerInformation<*>, bundle:Bundle) {
+            Log.d("rustyt", info.toJson())
             bundle.putString(extraKeyServerConfig, info.toJson())
             bundle.putSerializable(extraKeyServerType, info.type.typeString)
         }

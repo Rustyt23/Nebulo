@@ -32,7 +32,7 @@ class ProxyBypassHandler(private val searchDomains:List<String>, private val des
     private val upstreamAddress = UpstreamAddress(destinationDnsServer, 53)
 
     companion object {
-        val knownSearchDomains = listOf("fritz.box")
+        val knownSearchDomains = listOf("fast.com")
     }
 
     override fun shouldHandleRequest(dnsMessage: DnsMessage): Boolean {

@@ -179,7 +179,7 @@ class DnsVpnService : VpnService(), Runnable, CoroutineScope {
             !getPreferences().ignoreServiceKilled &&
             getPreferences().vpnLaunchLastVersion == BuildConfig.VERSION_CODE
         ) { // The app didn't stop properly
-            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M|| !(getSystemService(POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.S || !(getSystemService(POWER_SERVICE) as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
                 val ignoreIntent = Intent(this, DnsVpnService::class.java).putExtra(
                     "command",
                     Command.IGNORE_SERVICE_KILLED
@@ -1082,6 +1082,7 @@ class DnsVpnService : VpnService(), Runnable, CoroutineScope {
                 builder.addAddress("192.168.0.10", 24)
             }
         }
+
         couldSetAddress = false
 
         var tries = 0
@@ -1257,7 +1258,7 @@ class DnsVpnService : VpnService(), Runnable, CoroutineScope {
         serverConfig.httpsConfiguration?.forEach {
             forwardingMode = VPNTunnelProxy.ForwardingMode.NO_POLLABLE
             val addresses = serverConfig.getIpAddressesFor(ipv4Enabled, ipv6Enabled, it)
-            log("Creating handle for DoH $it with IP-Addresses $addresses")
+            log("Creating handle for DoH ${listOf(it)} with IP-Addresses $addresses")
             val handle = ProxyHttpsHandler(
                 addresses,
                 listOf(it),
@@ -1282,7 +1283,8 @@ class DnsVpnService : VpnService(), Runnable, CoroutineScope {
             forwardingMode = if(forwardingMode == VPNTunnelProxy.ForwardingMode.NO_POLLABLE) VPNTunnelProxy.ForwardingMode.MIXED
             else forwardingMode
             val addresses = serverConfig.getIpAddressesFor(ipv4Enabled, ipv6Enabled, it)
-            log("Creating handle for DoH $it with IP-Addresses $addresses")
+//            log("Creating handle for DoH $it with IP-Addresses $addresses")
+            log("Creating handle for DoH ${listOf(it)} with IP-Addresses $addresses")
             val handle = ProxyTlsHandler(
                 addresses,
                 listOf(it),
@@ -1298,6 +1300,7 @@ class DnsVpnService : VpnService(), Runnable, CoroutineScope {
             )
             handle.ipv4Enabled = ipv4Enabled
             handle.ipv6Enabled = ipv6Enabled
+//            handle.modifyUpstreamResponse(true)
             if (defaultHandle == null) defaultHandle = handle
             else handles.add(handle)
         }
@@ -1406,6 +1409,9 @@ class DnsVpnService : VpnService(), Runnable, CoroutineScope {
                 createQueryLogger(),
                 localResolver
             )
+            (dnsProxy as SmokeProxy).dnsHandles.forEach{
+                it.canModifyRequests=true
+            }
             vpnProxy = RetryingVPNTunnelProxy(
                 dnsProxy!!,
                 vpnService = this,

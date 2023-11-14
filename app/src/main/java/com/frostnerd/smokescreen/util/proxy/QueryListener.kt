@@ -87,7 +87,7 @@ class QueryListener(private val context: Context) : QueryListener {
         }
     }
 
-    override fun onQueryForwarded(
+        override fun onQueryForwarded(
         questionMessage: DnsMessage,
         destination: UpstreamAddress,
         usedHandle: DnsHandle
